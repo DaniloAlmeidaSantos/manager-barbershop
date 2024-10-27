@@ -1,7 +1,10 @@
-package com.br.barbershop.managerbarbershop.exceptions;
+package com.br.barbershop.managerbarbershop.exceptions.handler;
 
 import com.br.barbershop.managerbarbershop.domain.ApiResponseDTO;
 import com.br.barbershop.managerbarbershop.exceptions.AuthenticateException;
+import com.br.barbershop.managerbarbershop.exceptions.EmailValidatorException;
+import com.br.barbershop.managerbarbershop.exceptions.ScheduleConflictsException;
+import com.br.barbershop.managerbarbershop.exceptions.ServiceException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -18,6 +21,18 @@ public class BarbershopExceptionHandler {
                         new ApiResponseDTO(
                                 String.valueOf(HttpStatus.UNAUTHORIZED.value()),
                                 "Falha ao autenticar, e-mail ou senha incorretos."
+                        )
+                );
+    }
+
+    @ExceptionHandler({EmailValidatorException.class})
+    public  ResponseEntity<ApiResponseDTO> handleEmailValidatorException(EmailValidatorException ex) {
+        return ResponseEntity
+                .status(HttpStatus.PRECONDITION_FAILED)
+                .body(
+                        new ApiResponseDTO(
+                                String.valueOf(HttpStatus.PRECONDITION_FAILED.value()),
+                                "E-mail inválido: " + ex.getEmail()
                         )
                 );
     }

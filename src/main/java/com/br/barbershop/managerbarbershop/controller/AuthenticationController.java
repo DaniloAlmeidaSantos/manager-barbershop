@@ -1,5 +1,6 @@
 package com.br.barbershop.managerbarbershop.controller;
 
+import com.br.barbershop.managerbarbershop.annotations.RateLimitProtection;
 import com.br.barbershop.managerbarbershop.domain.user.JwtRequestDTO;
 import com.br.barbershop.managerbarbershop.domain.user.JwtResponseDTO;
 import com.br.barbershop.managerbarbershop.infra.security.JwtHelper;
@@ -22,14 +23,15 @@ public class AuthenticationController {
 
     private final JwtHelper helper;
 
-    private final AuthenticationManager authenticationManager;
-
+    @RateLimitProtection
     @PostMapping("/login")
     public ResponseEntity<JwtResponseDTO> login(@RequestBody JwtRequestDTO request) {
         var auth = doAuthenticate(request);
         JwtResponseDTO response = helper.generateToken((User) auth.getPrincipal());
         return ResponseEntity.ok(response);
     }
+
+    private final AuthenticationManager authenticationManager;
 
     private Authentication doAuthenticate(JwtRequestDTO request) {
         UsernamePasswordAuthenticationToken authentication =

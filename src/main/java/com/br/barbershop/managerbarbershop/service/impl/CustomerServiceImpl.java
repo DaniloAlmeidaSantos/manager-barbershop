@@ -6,10 +6,9 @@ import com.br.barbershop.managerbarbershop.domain.customer.CustomerEntity;
 import com.br.barbershop.managerbarbershop.exceptions.AuthenticateException;
 import com.br.barbershop.managerbarbershop.repository.CustomerRepository;
 import com.br.barbershop.managerbarbershop.service.CustomerService;
+import com.br.barbershop.managerbarbershop.utils.EmailValidatorUtils;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -22,8 +21,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerRepository repository;
 
-    @Autowired
-    public CustomerServiceImpl(PasswordEncoder passwordEncoder, CustomerRepository repository) {
+    private CustomerServiceImpl(PasswordEncoder passwordEncoder, CustomerRepository repository) {
         this.passwordEncoder = passwordEncoder;
         this.repository = repository;
     }
@@ -37,6 +35,7 @@ public class CustomerServiceImpl implements CustomerService {
             throw new RuntimeException("Error while encrypt password");
         }
 
+        EmailValidatorUtils.isEmailValid(customer.email());
         CustomerEntity entity = customer.withSecret(pwdEncrypted).convertToEntity();
         log.info("Creating customer in database...");
         var result = repository.save(entity);

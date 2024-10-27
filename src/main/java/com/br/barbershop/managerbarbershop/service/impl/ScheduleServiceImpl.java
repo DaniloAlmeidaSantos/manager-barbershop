@@ -16,7 +16,6 @@ import com.br.barbershop.managerbarbershop.service.ScheduleService;
 import com.br.barbershop.managerbarbershop.utils.DateUtils;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
@@ -38,8 +37,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     private final CustomerRepository customerRepository;
 
-    @Autowired
-    public ScheduleServiceImpl(BarberRepository barberRepository,
+    private ScheduleServiceImpl(BarberRepository barberRepository,
                                ServicesCostRepository servicesCostRepository,
                                ScheduleRepository scheduleRepository,
                                CustomerRepository customerRepository) {
