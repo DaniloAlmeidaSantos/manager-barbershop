@@ -9,6 +9,7 @@ import com.br.barbershop.managerbarbershop.service.CustomerService;
 import com.br.barbershop.managerbarbershop.utils.EmailValidatorUtils;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerRepository repository;
 
-    private CustomerServiceImpl(PasswordEncoder passwordEncoder, CustomerRepository repository) {
+    @Autowired
+    public CustomerServiceImpl(PasswordEncoder passwordEncoder, CustomerRepository repository) {
         this.passwordEncoder = passwordEncoder;
         this.repository = repository;
     }

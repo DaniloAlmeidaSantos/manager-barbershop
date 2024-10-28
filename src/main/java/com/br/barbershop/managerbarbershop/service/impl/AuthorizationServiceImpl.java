@@ -3,9 +3,7 @@ package com.br.barbershop.managerbarbershop.service.impl;
 import com.br.barbershop.managerbarbershop.domain.user.SystemUserEntity;
 import com.br.barbershop.managerbarbershop.exceptions.AuthenticateException;
 import com.br.barbershop.managerbarbershop.repository.SystemUserRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -23,8 +21,7 @@ public class AuthorizationServiceImpl implements UserDetailsService {
 
     private final SystemUserRepository repository;
 
-    @Autowired
-    public AuthorizationServiceImpl(PasswordEncoder passwordEncoder, SystemUserRepository repository) {
+    private AuthorizationServiceImpl(PasswordEncoder passwordEncoder, SystemUserRepository repository) {
         this.passwordEncoder = passwordEncoder;
         this.repository = repository;
     }

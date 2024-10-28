@@ -24,6 +24,7 @@ public class RateLimitAspect {
     @Value("${resilience4J.rateDuration}")
     private long rateDuration;
 
+    // TODO: Create rate limit to more specific, examples: RateLimitJWTAuthenticateProtect, RateLimitCustomerProtect
     @Before("@annotation(com.br.barbershop.managerbarbershop.annotations.RateLimitProtection)")
     public void rateLimit() {
         final ServletRequestAttributes requestAttributes =
