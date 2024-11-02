@@ -31,6 +31,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     @Transactional
     public void createUser(CustomerDTO customer) {
+        // TODO: Validate if exists email and phone in database before insert data in table.
         String pwdEncrypted = passwordEncoder.encode(customer.secret());
 
         if (pwdEncrypted == null) {

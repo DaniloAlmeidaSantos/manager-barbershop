@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Aspect
 @Component
 public class RateLimitAspect {
-    public static final String ERROR_MESSAGE = "To many request at endpoint %s from IP %s! Please try again after %d milliseconds!";
+    public static final String ERROR_MESSAGE = "To many request at endpoint %s from IP %s! ";
     private final ConcurrentHashMap<String, List<Long>> requestCounts = new ConcurrentHashMap<>();
 
     @Value("${resilience4J.rateLimit}")
@@ -35,7 +35,7 @@ public class RateLimitAspect {
         requestCounts.get(key).add(currentTime);
         cleanUpRequestCounts(currentTime);
         if (requestCounts.get(key).size() > rateLimit) {
-            throw new RateLimitException(String.format(ERROR_MESSAGE, requestAttributes.getRequest().getRequestURI(), key, rateDuration));
+            throw new RateLimitException(String.format(ERROR_MESSAGE, requestAttributes.getRequest().getRequestURI(), key));
         }
     }
 

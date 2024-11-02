@@ -52,6 +52,8 @@ public class ScheduleServiceImpl implements ScheduleService {
     @Override
     @Transactional
     public void scheduleService(ScheduleServiceDTO payload) {
+        // TODO: Validate if start time to schedule is after at 09am
+        // TODO: Validate if finish time to schedule is before at 10pm
         LocalDateTime startDateTime = DateUtils.convertStringToDate(payload.startTime());
         LocalDateTime finishDateTime = DateUtils.convertStringToDate(payload.finishTime());
 
