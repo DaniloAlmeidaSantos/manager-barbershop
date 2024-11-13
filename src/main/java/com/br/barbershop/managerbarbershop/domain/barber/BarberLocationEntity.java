@@ -16,6 +16,9 @@ public class BarberLocationEntity {
     @Column(name = "LOCATION_ID")
     private Integer id;
 
+    @Column(name = "LOCATION_COMPANY_NAME")
+    private String locationCompanyName;
+
     @Column(name = "LOCATION_NAME")
     private String locationName;
 

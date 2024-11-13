@@ -7,8 +7,12 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class GetServicesDTO {
+public class GetServicesRequestDTO {
     private String barberName;
     private String serviceName;
     private String locationName;
+
+    // Page filters
+    private int page;
+    private int size;
 }
