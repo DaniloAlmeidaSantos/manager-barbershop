@@ -14,6 +14,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class BarberServiceImpl implements BarberService {
 
+    // TODO: Planejar como retornar dados de serviços para o front conforme barbeiro selecionado
+
     private final BarberRepository barberRepository;
 
     private BarberServiceImpl(BarberRepository barberRepository) {

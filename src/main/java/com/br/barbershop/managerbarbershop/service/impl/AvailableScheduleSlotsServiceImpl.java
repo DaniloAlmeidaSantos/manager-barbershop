@@ -7,6 +7,7 @@ import com.br.barbershop.managerbarbershop.service.AvailableScheduleSlotsService
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
@@ -52,8 +53,17 @@ public class AvailableScheduleSlotsServiceImpl implements AvailableScheduleSlots
         for (int i = 0; i < APPOINTMENT_DAYS; i++) {
             try {
                 LocalDate date = currentDate.plusDays(i);
+
+                // TODO: Create method for this
+                // TODO: Getting settings in database for close schedule in determined dates
+                // TODO: In the database, save the days when the barbershop is closed in this format (1;2;3;4;5;6;7) and use DayOfWeek.of(1) for validation.
+                // TODO: Remind to use loop for getting data in database for compare (date.getDayOfWeek().getValue() == databaseValue)
+                if (date.getDayOfWeek() == DayOfWeek.MONDAY) {
+                    continue;
+                }
+
                 List<LocalTime> dailySlots = new ArrayList<>();
-                LocalTime currentTime = openingTime;
+                LocalTime currentTime = openingTime.isAfter(LocalTime.now()) ? LocalTime.now() : openingTime;
 
                 while (currentTime.isBefore(closingTime)) {
                     if (!occupiedSlots.getOrDefault(date, List.of()).contains(currentTime)) {

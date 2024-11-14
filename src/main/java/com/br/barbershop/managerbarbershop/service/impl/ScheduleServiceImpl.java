@@ -2,6 +2,7 @@ package com.br.barbershop.managerbarbershop.service.impl;
 
 import com.br.barbershop.managerbarbershop.domain.barber.BarberEntity;
 import com.br.barbershop.managerbarbershop.domain.customer.CustomerEntity;
+import com.br.barbershop.managerbarbershop.domain.schedule.RescheduleAppointmentDTO;
 import com.br.barbershop.managerbarbershop.domain.schedule.ScheduleEntity;
 import com.br.barbershop.managerbarbershop.domain.schedule.ScheduleServiceDTO;
 import com.br.barbershop.managerbarbershop.domain.schedule.ScheduleStatusEnum;
@@ -77,6 +78,13 @@ public class ScheduleServiceImpl implements ScheduleService {
         }
 
         log.info("Scheduling service {} to user {}", payload.services().toArray(), payload.customer());
+    }
+
+    @Override
+    @Transactional
+    public void rescheduleAppointment(RescheduleAppointmentDTO rescheduleAppointmentDTO) {
+        // Empty method
+        // TODO: Apply logical to reschedule appointment to customer
     }
 
     private void validateExistenceOfServices(Set<Integer> payloadServicesIds, List<ServicesCostEntity> services) {
