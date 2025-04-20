@@ -8,6 +8,7 @@ import com.br.barbershop.managerbarbershop.domain.schedule.ScheduleServiceDTO;
 import com.br.barbershop.managerbarbershop.domain.schedule.ScheduleStatusEnum;
 import com.br.barbershop.managerbarbershop.domain.service.ServicesCostEntity;
 import com.br.barbershop.managerbarbershop.exceptions.ScheduleConflictsException;
+import com.br.barbershop.managerbarbershop.exceptions.ScheduleServicesException;
 import com.br.barbershop.managerbarbershop.exceptions.ServiceException;
 import com.br.barbershop.managerbarbershop.repository.BarberRepository;
 import com.br.barbershop.managerbarbershop.repository.CustomerRepository;
@@ -15,6 +16,7 @@ import com.br.barbershop.managerbarbershop.repository.ScheduleRepository;
 import com.br.barbershop.managerbarbershop.repository.ServicesCostRepository;
 import com.br.barbershop.managerbarbershop.service.ScheduleService;
 import com.br.barbershop.managerbarbershop.utils.DateUtils;
+import jakarta.annotation.Nullable;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +41,6 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     private final CustomerRepository customerRepository;
 
-    @Autowired
     public ScheduleServiceImpl(BarberRepository barberRepository,
                                ServicesCostRepository servicesCostRepository,
                                ScheduleRepository scheduleRepository,
@@ -50,12 +51,14 @@ public class ScheduleServiceImpl implements ScheduleService {
         this.customerRepository = customerRepository;
     }
 
+
     @Override
-    @Transactional
-    public void scheduleService(ScheduleServiceDTO payload) {
+    @Transactional(rollbackOn = ScheduleServicesException.class)
+    public void scheduleService(ScheduleServiceDTO payload, @Nullable Integer appointmentId) {
         // TODO: Validate if start time to schedule is after at 09am
-        // TODO: Validate if finish time to schedule is before at 10pm
         LocalDateTime startDateTime = DateUtils.convertStringToDate(payload.startTime());
+
+        // TODO: Validate if finish time to schedule is before at 10pm
         LocalDateTime finishDateTime = DateUtils.convertStringToDate(payload.finishTime());
 
         if (startDateTime.isEqual(finishDateTime) || startDateTime.isAfter(finishDateTime)) {
@@ -64,27 +67,31 @@ public class ScheduleServiceImpl implements ScheduleService {
             throw new ScheduleConflictsException(startDateTime.toString(), finishDateTime.toString());
         }
 
-        BarberEntity barber = barberRepository.getReferenceById(payload.barber());
-        CustomerEntity customer = customerRepository.getReferenceById(payload.customer());
+        BarberEntity barber =  BarberEntity.builder().id(payload.barber()).build();
 
-        // Incluir validação impossibilitando de um mesmo usuário agendar mais de um horário no salão no mesmo dia? *
-        if (barber.getId() > 0 && customer.getId() > 0) {
+        try {
+
+            // TODO: Introduce in Redis this search's
+            CustomerEntity customer = customerRepository.getReferenceById(payload.customer());
             List<ServicesCostEntity> services = servicesCostRepository.findByBarberId(barber);
-            validateExistenceOfServices(payload.services(), services);
 
-            validatePreviousDatesScheduled(barber.getId(), startDateTime, finishDateTime);
+            // Incluir validação impossibilitando de um mesmo usuário agendar mais de um horário no salão no mesmo dia? *
+            if (services != null ) {
 
-            scheduleRepository.save(convertToEntity(barber, startDateTime, finishDateTime, customer, payload.services()));
+                validateExistenceOfServices(payload.services(), services);
+                validatePreviousDatesScheduled(barber.getId(), startDateTime, finishDateTime);
+
+                scheduleRepository.saveAndFlush(
+                        convertToEntity(barber, startDateTime, finishDateTime, customer, payload.services(), appointmentId)
+                );
+            }
+
+            log.info("Scheduling service {} to user {}", payload.services().toArray(), payload.customer());
+        } catch (Exception ex) {
+            log.error("Error to schedule services to {} for services {}: {}", payload.customer(), payload.services(), ex.getMessage(), ex);
+            throw new ScheduleServicesException("Error to schedule service to user: " + payload.customer(), ex);
         }
 
-        log.info("Scheduling service {} to user {}", payload.services().toArray(), payload.customer());
-    }
-
-    @Override
-    @Transactional
-    public void rescheduleAppointment(RescheduleAppointmentDTO rescheduleAppointmentDTO) {
-        // Empty method
-        // TODO: Apply logical to reschedule appointment to customer
     }
 
     private void validateExistenceOfServices(Set<Integer> payloadServicesIds, List<ServicesCostEntity> services) {
@@ -128,8 +135,10 @@ public class ScheduleServiceImpl implements ScheduleService {
                                            LocalDateTime startTime,
                                            LocalDateTime finishTime,
                                            CustomerEntity customer,
-                                           Set<Integer> servicesIds) {
+                                           Set<Integer> servicesIds,
+                                           Integer appointmentId) {
         return ScheduleEntity.builder()
+                .id(appointmentId)
                 .barber(barber)
                 .scheduleServices(servicesIds.toString())
                 .customer(customer)

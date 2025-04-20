@@ -26,6 +26,7 @@ public class AuthorizationServiceImpl implements UserDetailsService {
         this.repository = repository;
     }
 
+    // TODO: Implement proxy arch with redis
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         SystemUserEntity entity = repository.findByUsername(username);

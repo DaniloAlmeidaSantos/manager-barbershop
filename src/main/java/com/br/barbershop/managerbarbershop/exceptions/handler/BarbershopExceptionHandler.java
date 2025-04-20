@@ -53,7 +53,7 @@ public class BarbershopExceptionHandler {
     public ResponseEntity<ApiResponseDTO> handleConflictsOnScheduleDateAndTime(ScheduleConflictsException ex) {
         String scheduleDescriptionException = ex.isMismatchDateTime() ?
                 "A data e hora de finalização não pode ser maior que a data e hora de inicio." :
-                "Já existem serviços agendados para este horário por outro cliente.";
+                "Horário indisponível para agendamento.";
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)

@@ -23,15 +23,15 @@ public class AuthenticationController {
 
     private final JwtHelper helper;
 
+    private final AuthenticationManager authenticationManager;
+
     @RateLimitProtection
     @PostMapping("/login")
     public ResponseEntity<JwtResponseDTO> login(@RequestBody JwtRequestDTO request) {
-        var auth = doAuthenticate(request);
+        var auth = this.doAuthenticate(request);
         JwtResponseDTO response = helper.generateToken((User) auth.getPrincipal());
         return ResponseEntity.ok(response);
     }
-
-    private final AuthenticationManager authenticationManager;
 
     private Authentication doAuthenticate(JwtRequestDTO request) {
         UsernamePasswordAuthenticationToken authentication =

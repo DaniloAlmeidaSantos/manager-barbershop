@@ -1,5 +1,6 @@
 package com.br.barbershop.managerbarbershop.domain.barber;
 
+import com.br.barbershop.managerbarbershop.domain.schedule.AvailableTimesDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -11,5 +12,5 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 public class BarberAvailableTimesDTO {
-    private Map<LocalDate, List<LocalTime>> availableTimes;
+    private List<AvailableTimesDTO> availableTimes;
 }

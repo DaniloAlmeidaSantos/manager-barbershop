@@ -18,7 +18,7 @@ import java.util.UUID;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class RateLimitExceptionHandler {
     @ExceptionHandler({RateLimitException.class})
-    public ResponseEntity<ApiResponseDTO> handleInvalidFieldsInValidJson(final RateLimitException rateLimitException, final HttpServletRequest request) {
+    public ResponseEntity<ApiResponseDTO> handleInvalidFieldsInValidJson(final RateLimitException rateLimitException) {
         log.error(String.format("%s: %s", UUID.randomUUID(), rateLimitException.getMessage()), rateLimitException);
         return new ResponseEntity<>(
                 new ApiResponseDTO(HttpStatus.TOO_MANY_REQUESTS.toString(), rateLimitException.getMessage()),
