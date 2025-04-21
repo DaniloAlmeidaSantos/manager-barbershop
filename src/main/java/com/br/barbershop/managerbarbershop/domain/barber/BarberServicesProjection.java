@@ -6,4 +6,6 @@ public interface BarberServicesProjection {
     String getBarberLocation();
     String getBarberCompany();
     String getBarberLocationNumber();
+
+    // TODO: Add Longitude and Latitude to source exactly location
 }

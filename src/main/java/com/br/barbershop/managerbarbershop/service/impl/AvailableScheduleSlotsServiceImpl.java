@@ -15,13 +15,13 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.br.barbershop.managerbarbershop.domain.config.ConfigNameEnum.CLOSE_DAY;
+
 @Slf4j
 @Service
 public class AvailableScheduleSlotsServiceImpl implements AvailableScheduleSlotsService {
 
     private static final int APPOINTMENT_DAYS = 7;
-    private static final String CONFIG_NAME = "CLOSE-DAY";
-
     private final ScheduleRepository scheduleRepository;
 
     private final BarbershopConfigRepository configRepository;
@@ -49,7 +49,7 @@ public class AvailableScheduleSlotsServiceImpl implements AvailableScheduleSlots
         List<ScheduleDTO> occupiedAppointments = scheduleRepository.findOccupiedSchedules(APPOINTMENT_DAYS);
 
         // TODO: Introduce this to cache in REDIS or in machine
-        Optional<String> configCloseDay = configRepository.findConfigValueToBarber(barber, CONFIG_NAME);
+        Optional<String> configCloseDay = configRepository.findConfigValueToBarber(barber, CLOSE_DAY.getConfigName());
 
         List<String> closeDays = configCloseDay.isPresent() ? Arrays.asList(configCloseDay.get().split(";")) :
                 new ArrayList<>();

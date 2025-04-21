@@ -1,5 +1,6 @@
 package com.br.barbershop.managerbarbershop.controller;
 
+import com.br.barbershop.managerbarbershop.annotations.RateLimitProtection;
 import com.br.barbershop.managerbarbershop.domain.ApiResponseDTO;
 import com.br.barbershop.managerbarbershop.domain.barber.BarberAvailableTimesDTO;
 import com.br.barbershop.managerbarbershop.domain.customer.CustomerAuthenticateDTO;
@@ -52,9 +53,9 @@ public class CustomerController {
         return ResponseEntity.ok(new ApiResponseDTO("200", "Serviços agendados com sucesso"));
     }
 
-
+    @RateLimitProtection
     @GetMapping(value = "/available-hours/{id}")
-    public ResponseEntity<BarberAvailableTimesDTO> findAvailableHours() {
-        return ResponseEntity.ok(availableScheduleSlotsService.findAvailableSlots(1));
+    public ResponseEntity<BarberAvailableTimesDTO> findAvailableHours(@PathVariable Integer id) {
+        return ResponseEntity.ok(availableScheduleSlotsService.findAvailableSlots(id));
     }
 }
