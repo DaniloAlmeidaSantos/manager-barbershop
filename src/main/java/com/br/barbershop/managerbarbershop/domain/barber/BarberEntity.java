@@ -1,5 +1,6 @@
 package com.br.barbershop.managerbarbershop.domain.barber;
 
+import com.br.barbershop.managerbarbershop.domain.user.SystemUserEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,4 +26,12 @@ public class BarberEntity {
     @OneToOne
     @JoinColumn(name = "BARBER_LOCATION_ID", referencedColumnName = "LOCATION_ID")
     private BarberLocationEntity locationId;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "BARBER_ROLE", nullable = false)
+    private BarberRoleEnum role;
+
+    @OneToOne
+    @JoinColumn(name = "SYS_USER_ID", referencedColumnName = "SYS_ID")
+    private SystemUserEntity systemUser;
 }

@@ -1,16 +1,13 @@
 package com.br.barbershop.managerbarbershop.app.service.impl;
 
-import com.br.barbershop.managerbarbershop.domain.customer.CustomerAuthenticateDTO;
 import com.br.barbershop.managerbarbershop.domain.customer.CustomerDTO;
 import com.br.barbershop.managerbarbershop.domain.customer.CustomerEntity;
-import com.br.barbershop.managerbarbershop.infra.exceptions.AuthenticateException;
 import com.br.barbershop.managerbarbershop.infra.repository.CustomerRepository;
 import com.br.barbershop.managerbarbershop.app.service.CustomerService;
 import com.br.barbershop.managerbarbershop.app.utils.EmailValidatorUtils;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -50,17 +47,4 @@ public class CustomerServiceImpl implements CustomerService {
         log.info("Customer {} created success!", customer.name());
     }
 
-    @Override
-    public CustomerDTO authenticateUser(CustomerAuthenticateDTO customerAuthenticate) {
-        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-        CustomerEntity entity = repository.findByEmail(customerAuthenticate.email());
-
-        if (entity != null && encoder.matches(customerAuthenticate.password(), entity.getPassword())) {
-            CustomerDTO customer = entity.convertToDTO();
-            log.info("Customer {} authenticated success.", customer.name());
-            return customer;
-        }
-
-        throw new AuthenticateException();
-    }
 }

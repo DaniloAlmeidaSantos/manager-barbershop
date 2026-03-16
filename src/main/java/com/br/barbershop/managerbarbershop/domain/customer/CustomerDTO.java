@@ -1,6 +1,5 @@
 package com.br.barbershop.managerbarbershop.domain.customer;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 public record CustomerDTO(

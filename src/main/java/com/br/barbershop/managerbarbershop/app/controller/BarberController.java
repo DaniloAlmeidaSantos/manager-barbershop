@@ -6,6 +6,7 @@ import com.br.barbershop.managerbarbershop.domain.barber.BarberServicesProjectio
 import com.br.barbershop.managerbarbershop.domain.config.CreateConfigRequestDTO;
 import com.br.barbershop.managerbarbershop.domain.service.GetServicesRequestDTO;
 import com.br.barbershop.managerbarbershop.app.service.BarberService;
+import com.br.barbershop.managerbarbershop.app.service.BarbershopConfigService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,6 +22,8 @@ public class BarberController {
 
     private final BarberService barberService;
 
+    private final BarbershopConfigService barbershopConfigService;
+
     @RateLimitProtection
     @PostMapping("/find")
     public Page<BarberServicesProjection> findBarbers(@RequestBody GetServicesRequestDTO request) {
@@ -29,7 +32,7 @@ public class BarberController {
 
     @PostMapping("/config")
     public ResponseEntity<ApiResponseDTO> createConfig(@RequestBody @Valid CreateConfigRequestDTO payload) {
-        barberService.createConfig(payload);
+        barbershopConfigService.createConfig(payload);
         return new ResponseEntity<>(
                 new ApiResponseDTO(HttpStatus.CREATED.toString(), "Configuração criada com sucesso"),
                 HttpStatus.CREATED

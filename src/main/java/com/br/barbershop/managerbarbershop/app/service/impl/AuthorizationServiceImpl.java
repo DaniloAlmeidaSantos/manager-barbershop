@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -17,12 +16,9 @@ import org.springframework.stereotype.Service;
 @Qualifier("authorization-backend")
 public class AuthorizationServiceImpl implements UserDetailsService {
 
-    private final PasswordEncoder passwordEncoder;
-
     private final SystemUserRepository repository;
 
-    private AuthorizationServiceImpl(PasswordEncoder passwordEncoder, SystemUserRepository repository) {
-        this.passwordEncoder = passwordEncoder;
+    private AuthorizationServiceImpl(SystemUserRepository repository) {
         this.repository = repository;
     }
 
@@ -39,9 +35,12 @@ public class AuthorizationServiceImpl implements UserDetailsService {
     }
 
     private UserDetails convertToUserDetails(SystemUserEntity entity) {
+        // NOTE: The password stored in TB_SYSTEM_USERS must be an Argon2 hash.
+        // DaoAuthenticationProvider calls passwordEncoder.matches(rawInput, storedHash) internally.
+        // Do NOT re-encode here — double-hashing would always fail authentication.
         return User.builder()
                 .roles(entity.getRole())
-                .password(passwordEncoder.encode(entity.getPassword()))
+                .password(entity.getPassword())
                 .username(entity.getUsername())
                 .build();
     }

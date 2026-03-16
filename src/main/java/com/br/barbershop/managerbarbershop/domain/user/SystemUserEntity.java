@@ -2,11 +2,13 @@ package com.br.barbershop.managerbarbershop.domain.user;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @Entity
+@Builder
 @Table(name = "tb_system_users")
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,11 +21,9 @@ public class SystemUserEntity {
     @Column(name = "SYS_ROLE")
     private String role;
 
-    @Column(name = "SYS_USERNAME")
+    @Column(name = "SYS_USERNAME", unique = true, nullable = false)
     private String username;
 
-    @Column(name = "SYS_PASSWORD")
+    @Column(name = "SYS_PASSWORD", nullable = false)
     private String password;
-
-
 }

@@ -95,6 +95,13 @@
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-aop</artifactId>
 		</dependency>
+
+		<!-- Argon2 password hashing (requires BouncyCastle) -->
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcpkix-jdk18on</artifactId>
+			<version>1.78.1</version>
+		</dependency>
 	</dependencies>
 
 	<build>

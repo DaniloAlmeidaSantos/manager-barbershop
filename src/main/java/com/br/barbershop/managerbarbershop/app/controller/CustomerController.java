@@ -3,7 +3,6 @@ package com.br.barbershop.managerbarbershop.app.controller;
 import com.br.barbershop.managerbarbershop.app.annotations.RateLimitProtection;
 import com.br.barbershop.managerbarbershop.domain.ApiResponseDTO;
 import com.br.barbershop.managerbarbershop.domain.barber.BarberAvailableTimesDTO;
-import com.br.barbershop.managerbarbershop.domain.customer.CustomerAuthenticateDTO;
 import com.br.barbershop.managerbarbershop.domain.customer.CustomerDTO;
 import com.br.barbershop.managerbarbershop.domain.schedule.ScheduleServiceDTO;
 import com.br.barbershop.managerbarbershop.app.service.AvailableScheduleSlotsService;
@@ -34,12 +33,6 @@ public class CustomerController {
                     String.valueOf(HttpStatus.CREATED.value()), "Usuário criado com sucesso!"));
     }
 
-    @PostMapping(value = "/authenticate")
-    public ResponseEntity<CustomerDTO> authenticateCustomer(@RequestBody CustomerAuthenticateDTO payload) {
-        CustomerDTO customer = customerService.authenticateUser(payload);
-        return ResponseEntity.ok(customer);
-    }
-
     @PostMapping(value = "/schedule/service")
     public ResponseEntity<ApiResponseDTO> scheduleService(@RequestBody ScheduleServiceDTO payload){
         scheduleService.scheduleService(payload, null);
@@ -51,6 +44,12 @@ public class CustomerController {
             @RequestBody ScheduleServiceDTO payload, @PathVariable(required = false) Integer id) {
         scheduleService.scheduleService(payload, id);
         return ResponseEntity.ok(new ApiResponseDTO("200", "Serviços agendados com sucesso"));
+    }
+
+    @DeleteMapping(value = "/schedule/service/{id}")
+    public ResponseEntity<ApiResponseDTO> cancelService(@PathVariable Integer id) {
+        scheduleService.cancelSchedule(id);
+        return ResponseEntity.ok(new ApiResponseDTO("200", "Agendamento cancelado com sucesso"));
     }
 
     @RateLimitProtection

@@ -5,4 +5,6 @@ import jakarta.annotation.Nullable;
 
 public interface ScheduleService {
     void scheduleService(ScheduleServiceDTO payload, @Nullable Integer appointmentId);
+
+    void cancelSchedule(Integer appointmentId);
 }

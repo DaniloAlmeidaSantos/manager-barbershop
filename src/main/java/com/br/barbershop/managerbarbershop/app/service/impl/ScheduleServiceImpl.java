@@ -7,6 +7,7 @@ import com.br.barbershop.managerbarbershop.domain.schedule.ScheduleServiceDTO;
 import com.br.barbershop.managerbarbershop.domain.schedule.ScheduleStatusEnum;
 import com.br.barbershop.managerbarbershop.domain.service.ServicesCostEntity;
 import com.br.barbershop.managerbarbershop.infra.exceptions.ScheduleConflictsException;
+import com.br.barbershop.managerbarbershop.infra.exceptions.ScheduleNotFoundException;
 import com.br.barbershop.managerbarbershop.infra.exceptions.ScheduleServicesException;
 import com.br.barbershop.managerbarbershop.infra.exceptions.ServiceException;
 import com.br.barbershop.managerbarbershop.infra.repository.BarberRepository;
@@ -49,7 +50,6 @@ public class ScheduleServiceImpl implements ScheduleService {
         this.customerRepository = customerRepository;
     }
 
-
     @Override
     @Transactional(rollbackOn = ScheduleServicesException.class)
     public void scheduleService(ScheduleServiceDTO payload, @Nullable Integer appointmentId) {
@@ -65,17 +65,15 @@ public class ScheduleServiceImpl implements ScheduleService {
             throw new ScheduleConflictsException(startDateTime.toString(), finishDateTime.toString());
         }
 
-        BarberEntity barber =  BarberEntity.builder().id(payload.barber()).build();
+        BarberEntity barber = BarberEntity.builder().id(payload.barber()).build();
 
         try {
-
             // TODO: Introduce in Redis this search's
             CustomerEntity customer = customerRepository.getReferenceById(payload.customer());
             List<ServicesCostEntity> services = servicesCostRepository.findByBarberId(barber);
 
             // Incluir validação impossibilitando de um mesmo usuário agendar mais de um horário no salão no mesmo dia? *
-            if (services != null ) {
-
+            if (services != null) {
                 validateExistenceOfServices(payload.services(), services);
                 validatePreviousDatesScheduled(barber.getId(), startDateTime, finishDateTime);
 
@@ -85,11 +83,25 @@ public class ScheduleServiceImpl implements ScheduleService {
             }
 
             log.info("Scheduling service {} to user {}", payload.services().toArray(), payload.customer());
+
+        } catch (ScheduleConflictsException | ServiceException ex) {
+            // Re-throw business validation exceptions so the correct handler responds
+            throw ex;
         } catch (Exception ex) {
             log.error("Error to schedule services to {} for services {}: {}", payload.customer(), payload.services(), ex.getMessage(), ex);
             throw new ScheduleServicesException("Error to schedule service to user: " + payload.customer(), ex);
         }
+    }
 
+    @Override
+    @Transactional
+    public void cancelSchedule(Integer appointmentId) {
+        ScheduleEntity schedule = scheduleRepository.findById(appointmentId)
+                .orElseThrow(() -> new ScheduleNotFoundException(appointmentId));
+
+        schedule.setStatusEnum(ScheduleStatusEnum.C);
+        scheduleRepository.save(schedule);
+        log.info("Appointment {} cancelled successfully.", appointmentId);
     }
 
     private void validateExistenceOfServices(Set<Integer> payloadServicesIds, List<ServicesCostEntity> services) {
@@ -116,6 +128,8 @@ public class ScheduleServiceImpl implements ScheduleService {
                 scheduleRepository.findByBarberIdAndStartDate(barberId, Date.valueOf(startDateTime.toLocalDate()));
 
         var scheduleConflict = barberSchedules.stream()
+                // Only active/pending slots occupy time — cancelled and finished ones are free again
+                .filter(schedule -> !schedule.getStatusEnum().isCancelled() && !schedule.getStatusEnum().isFinished())
                 .filter(schedule -> !(
                         finishDateTime.isBefore(schedule.getStartTime()) || startDateTime.isAfter(schedule.getFinishTime())
                 ))
