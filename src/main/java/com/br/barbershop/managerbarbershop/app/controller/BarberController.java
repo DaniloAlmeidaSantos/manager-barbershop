@@ -34,7 +34,7 @@ public class BarberController {
     public ResponseEntity<ApiResponseDTO> createConfig(@RequestBody @Valid CreateConfigRequestDTO payload) {
         barbershopConfigService.createConfig(payload);
         return new ResponseEntity<>(
-                new ApiResponseDTO(HttpStatus.CREATED.toString(), "Configuração criada com sucesso"),
+                new ApiResponseDTO(String.valueOf(HttpStatus.CREATED.value()), "Configuração criada com sucesso"),
                 HttpStatus.CREATED
         );
     }

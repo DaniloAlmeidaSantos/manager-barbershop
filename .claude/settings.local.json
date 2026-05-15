@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mysql:*)",
+      "Bash(java:*)",
+      "Read(//c/Program Files/**)",
+      "Bash(reg query:*)",
+      "Bash(sleep:*)",
+      "Bash(docker run:*)",
+      "Bash(netstat:*)",
+      "Bash(tasklist:*)",
+      "Bash(docker exec:*)",
+      "Bash(export:*)",
+      "Bash(ls:*)",
+      "Bash(bash \"/c/Users/Pichau/AppData/Local/Temp/run_tests.sh\" 2>/dev/null)"
+    ]
+  }
+}

@@ -28,7 +28,7 @@ public class CustomerController {
     @PostMapping
     public ResponseEntity<ApiResponseDTO> createUser(@RequestBody CustomerDTO payload) {
         customerService.createUser(payload);
-        return ResponseEntity.ok(
+        return ResponseEntity.status(HttpStatus.CREATED).body(
                 new ApiResponseDTO(
                     String.valueOf(HttpStatus.CREATED.value()), "Usuário criado com sucesso!"));
     }

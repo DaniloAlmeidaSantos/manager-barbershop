@@ -26,7 +26,7 @@ public interface ScheduleRepository extends JpaRepository<ScheduleEntity, Intege
                     TIME(SCHEDULE_START_TIME) AS startTime,
                     TIME(SCHEDULE_FINISH_TIME) AS finishTime
                 FROM
-                    tb_schedule
+                    TB_SCHEDULE
                 WHERE
                     SCHEDULE_STATUS = "A"
                     AND DATE(SCHEDULE_START_TIME) BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL :days DAY)

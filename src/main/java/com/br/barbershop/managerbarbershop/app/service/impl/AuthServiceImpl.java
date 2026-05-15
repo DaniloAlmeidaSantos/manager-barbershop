@@ -65,7 +65,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public JwtResponseDTO loginCustomer(CustomerLoginRequestDTO request) {
+        public JwtResponseDTO loginCustomer(CustomerLoginRequestDTO request) {
         authenticate(customerAuthManager, request.email(), request.password());
 
         CustomerEntity customer = customerRepository.findByEmail(request.email());

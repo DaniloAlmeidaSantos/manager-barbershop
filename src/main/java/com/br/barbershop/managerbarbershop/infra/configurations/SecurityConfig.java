@@ -4,6 +4,7 @@ import com.br.barbershop.managerbarbershop.infra.security.JwtAuthenticationFilte
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
@@ -58,7 +59,9 @@ public class SecurityConfig {
 
                         // --- ADMIN-only barber operations (evaluated before the general barber rule) ---
                         .requestMatchers(HttpMethod.POST, "/v1/barber/management/barbers").hasRole("BARBER_ADMIN")
-                        .requestMatchers(HttpMethod.POST, "/v1/barber/management/locations").hasRole("BARBER_ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/v1/barber/manage" +
+                                "" +
+                                "ment/locations").hasRole("BARBER_ADMIN")
                         .requestMatchers(HttpMethod.POST, "/v1/barber/config").hasRole("BARBER_ADMIN")
 
                         // --- Any authenticated barber ---
@@ -82,6 +85,7 @@ public class SecurityConfig {
      * AuthenticationManager for barbers: validates against TB_SYSTEM_USERS
      * using Argon2 password hashing.
      */
+    @Primary
     @Bean("barberAuthManager")
     public AuthenticationManager barberAuthenticationManager() {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();

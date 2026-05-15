@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @Entity
 @Builder
-@Table(name = "tb_system_users")
+@Table(name = "TB_SYSTEM_USERS")
 @AllArgsConstructor
 @NoArgsConstructor
 public class SystemUserEntity {
