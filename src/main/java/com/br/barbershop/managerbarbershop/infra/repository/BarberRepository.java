@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface BarberRepository extends JpaRepository<BarberEntity, Integer> {
     @Query(value = """
@@ -34,4 +36,11 @@ public interface BarberRepository extends JpaRepository<BarberEntity, Integer> {
                                                         @Param("locationName") String locationName,
                                                         @Param("serviceName") String serviceName,
                                                         Pageable pageable);
+
+    /**
+     * Looks up a barber by the username of their linked SystemUserEntity.
+     * Used during login to resolve the barber ID for the JWT userId claim.
+     */
+    @Query("SELECT b FROM BarberEntity b WHERE b.systemUser.username = :username")
+    Optional<BarberEntity> findBySystemUserUsername(@Param("username") String username);
 }

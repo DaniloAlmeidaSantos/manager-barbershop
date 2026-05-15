@@ -1,0 +1,522 @@
+{
+  "info": {
+    "name": "Manager Barbershop API",
+    "description": "Collection completa da API Manager Barbershop com todos os endpoints, autenticação JWT e exemplos de request body.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080/manager-barbershop",
+      "type": "string"
+    },
+    {
+      "key": "barberToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "customerToken",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Barber Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.token) {",
+                  "    pm.collectionVariables.set('barberToken', res.token);",
+                  "    console.log('Barber token salvo:', res.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"senha123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/barber/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "barber", "login"]
+            },
+            "description": "Login do barbeiro (ADMIN ou EMPLOYEE). Retorna JWT token. Rate limit: 20 req/10s."
+          }
+        },
+        {
+          "name": "Customer Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.token) {",
+                  "    pm.collectionVariables.set('customerToken', res.token);",
+                  "    console.log('Customer token salvo:', res.token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"cliente@email.com\",\n  \"password\": \"senha123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/customer/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "customer", "login"]
+            },
+            "description": "Login do cliente. Retorna JWT token. Rate limit: 20 req/10s."
+          }
+        },
+        {
+          "name": "Bootstrap Admin Barber",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Barbeiro Admin\",\n  \"locationId\": 1,\n  \"username\": \"admin\",\n  \"password\": \"senha123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/bootstrap",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "bootstrap"]
+            },
+            "description": "Cria o primeiro barbeiro ADMIN do sistema. Funciona apenas uma vez (quando TB_BARBERS está vazia). Restrito ao IP configurado em SERVER_PRINCIPLE_IP."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Barber",
+      "item": [
+        {
+          "name": "Find Barbers",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{barberToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"barberName\": \"\",\n  \"serviceName\": \"\",\n  \"locationName\": \"\",\n  \"page\": 0,\n  \"size\": 10\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/barber/find",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "barber", "find"]
+            },
+            "description": "Busca barbeiros com filtros opcionais (nome, serviço, localização). Paginado. Roles: BARBER_ADMIN, BARBER_EMPLOYEE. Rate limit: 20 req/10s."
+          }
+        },
+        {
+          "name": "Create Barbershop Configuration",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{barberToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"configId\": null,\n  \"barberId\": null,\n  \"configValue\": \"192.168.0.1\",\n  \"configName\": \"SERVER_PRINCIPLE_IP\",\n  \"locationId\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/barber/config",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "barber", "config"]
+            },
+            "description": "Cria uma configuração da barbearia. Role: BARBER_ADMIN apenas.\n\nValores possíveis para configName:\n- SERVER_PRINCIPLE_IP\n- Outros valores do enum ConfigNameEnum"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Barber Management",
+      "item": [
+        {
+          "name": "Register Employee Barber",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{barberToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"João Barbeiro\",\n  \"locationId\": 1,\n  \"username\": \"joao.barbeiro\",\n  \"password\": \"senha123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/barber/management/barbers",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "barber", "management", "barbers"]
+            },
+            "description": "Cadastra um novo barbeiro EMPLOYEE. Role: BARBER_ADMIN apenas."
+          }
+        },
+        {
+          "name": "Create Barbershop Location",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{barberToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"companyName\": \"Barbearia do João\",\n  \"locationName\": \"Unidade Centro\",\n  \"postalCode\": \"01310-100\",\n  \"complement\": \"Sala 201\",\n  \"number\": \"500\",\n  \"state\": \"S\",\n  \"city\": \"São Paulo\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/barber/management/locations",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "barber", "management", "locations"]
+            },
+            "description": "Cria uma nova localização/unidade da barbearia. Role: BARBER_ADMIN apenas.\n\nObs: 'state' deve ter exatamente 1 caractere (ex: 'S' para SP)."
+          }
+        },
+        {
+          "name": "Get Current Appointments",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{barberToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/barber/management/appointments",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "barber", "management", "appointments"]
+            },
+            "description": "Lista os agendamentos ativos e pendentes do barbeiro autenticado (barberId extraído do JWT). Roles: BARBER_ADMIN, BARBER_EMPLOYEE."
+          }
+        },
+        {
+          "name": "Get Appointment History",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{barberToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/barber/management/appointments/history",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "barber", "management", "appointments", "history"]
+            },
+            "description": "Lista o histórico de agendamentos (cancelados e finalizados) do barbeiro autenticado. Roles: BARBER_ADMIN, BARBER_EMPLOYEE."
+          }
+        },
+        {
+          "name": "Schedule Appointment for Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{barberToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"services\": [1, 2],\n  \"customer\": 1,\n  \"barber\": 1,\n  \"startTime\": \"2026-03-22T10:00:00\",\n  \"finishTime\": \"2026-03-22T11:00:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/barber/management/appointments",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "barber", "management", "appointments"]
+            },
+            "description": "Agenda um serviço para um cliente. Realizado pelo barbeiro. Roles: BARBER_ADMIN, BARBER_EMPLOYEE.\n\n'services' é um array de IDs de serviços.\n'startTime' e 'finishTime' no formato ISO 8601."
+          }
+        },
+        {
+          "name": "Reschedule Appointment",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{barberToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"services\": [1, 2],\n  \"customer\": 1,\n  \"barber\": 1,\n  \"startTime\": \"2026-03-22T14:00:00\",\n  \"finishTime\": \"2026-03-22T15:00:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/barber/management/appointments/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "barber", "management", "appointments", "1"]
+            },
+            "description": "Reagenda um agendamento existente pelo ID. Roles: BARBER_ADMIN, BARBER_EMPLOYEE.\n\nSubstitua '1' na URL pelo ID real do agendamento."
+          }
+        },
+        {
+          "name": "Cancel Appointment",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{barberToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/barber/management/appointments/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "barber", "management", "appointments", "1"]
+            },
+            "description": "Cancela um agendamento pelo ID. Roles: BARBER_ADMIN, BARBER_EMPLOYEE.\n\nSubstitua '1' na URL pelo ID real do agendamento."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Customer",
+      "item": [
+        {
+          "name": "Create Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": 0,\n  \"name\": \"Maria Cliente\",\n  \"phone\": \"11999999999\",\n  \"secret\": \"senha123\",\n  \"email\": \"maria@email.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/customer",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "customer"]
+            },
+            "description": "Cria um novo cliente. Endpoint público, sem autenticação necessária."
+          }
+        },
+        {
+          "name": "Schedule Service (Customer)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"services\": [1, 2],\n  \"customer\": 1,\n  \"barber\": 1,\n  \"startTime\": \"2026-03-22T10:00:00\",\n  \"finishTime\": \"2026-03-22T11:00:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/customer/schedule/service",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "customer", "schedule", "service"]
+            },
+            "description": "Cliente agenda um serviço. Role: CUSTOMER.\n\n'services' é um array de IDs de serviços.\n'startTime' e 'finishTime' no formato ISO 8601."
+          }
+        },
+        {
+          "name": "Reschedule Service (Customer)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"services\": [1, 2],\n  \"customer\": 1,\n  \"barber\": 1,\n  \"startTime\": \"2026-03-22T14:00:00\",\n  \"finishTime\": \"2026-03-22T15:00:00\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/customer/schedule/service/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "customer", "schedule", "service", "1"]
+            },
+            "description": "Cliente reagenda um serviço existente. Role: CUSTOMER.\n\nSubstitua '1' na URL pelo ID real do agendamento."
+          }
+        },
+        {
+          "name": "Cancel Service (Customer)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/customer/schedule/service/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "customer", "schedule", "service", "1"]
+            },
+            "description": "Cliente cancela seu próprio agendamento. Role: CUSTOMER.\n\nSubstitua '1' na URL pelo ID real do agendamento."
+          }
+        },
+        {
+          "name": "Get Available Hours for Barber",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{customerToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/customer/available-hours/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "customer", "available-hours", "1"]
+            },
+            "description": "Retorna os horários disponíveis de um barbeiro específico. Role: CUSTOMER. Rate limit: 20 req/10s.\n\nSubstitua '1' na URL pelo ID real do barbeiro."
+          }
+        }
+      ]
+    }
+  ]
+}

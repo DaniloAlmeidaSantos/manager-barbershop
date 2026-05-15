@@ -1,10 +1,7 @@
 package com.br.barbershop.managerbarbershop.infra.exceptions.handler;
 
 import com.br.barbershop.managerbarbershop.domain.ApiResponseDTO;
-import com.br.barbershop.managerbarbershop.infra.exceptions.AuthenticateException;
-import com.br.barbershop.managerbarbershop.infra.exceptions.EmailValidatorException;
-import com.br.barbershop.managerbarbershop.infra.exceptions.ScheduleConflictsException;
-import com.br.barbershop.managerbarbershop.infra.exceptions.ServiceException;
+import com.br.barbershop.managerbarbershop.infra.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,7 +23,7 @@ public class BarbershopExceptionHandler {
     }
 
     @ExceptionHandler({EmailValidatorException.class})
-    public  ResponseEntity<ApiResponseDTO> handleEmailValidatorException(EmailValidatorException ex) {
+    public ResponseEntity<ApiResponseDTO> handleEmailValidatorException(EmailValidatorException ex) {
         return ResponseEntity
                 .status(HttpStatus.PRECONDITION_FAILED)
                 .body(
@@ -58,5 +55,43 @@ public class BarbershopExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(new ApiResponseDTO(String.valueOf(HttpStatus.BAD_REQUEST.value()), scheduleDescriptionException));
+    }
+
+    @ExceptionHandler({ScheduleNotFoundException.class})
+    public ResponseEntity<ApiResponseDTO> handleScheduleNotFound(ScheduleNotFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ApiResponseDTO(String.valueOf(HttpStatus.NOT_FOUND.value()), ex.getMessage()));
+    }
+
+    @ExceptionHandler({ScheduleServicesException.class})
+    public ResponseEntity<ApiResponseDTO> handleScheduleServicesError(ScheduleServicesException ex) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ApiResponseDTO(
+                        String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()),
+                        "Erro interno ao processar agendamento. Tente novamente."
+                ));
+    }
+
+    @ExceptionHandler({BarberNotFoundException.class})
+    public ResponseEntity<ApiResponseDTO> handleBarberNotFound(BarberNotFoundException ex) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ApiResponseDTO(String.valueOf(HttpStatus.NOT_FOUND.value()), ex.getMessage()));
+    }
+
+    @ExceptionHandler({UnauthorizedBarberOperationException.class})
+    public ResponseEntity<ApiResponseDTO> handleUnauthorizedBarberOperation(UnauthorizedBarberOperationException ex) {
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(new ApiResponseDTO(String.valueOf(HttpStatus.FORBIDDEN.value()), ex.getMessage()));
+    }
+
+    @ExceptionHandler({UsernameAlreadyExistsException.class})
+    public ResponseEntity<ApiResponseDTO> handleUsernameAlreadyExists(UsernameAlreadyExistsException ex) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(new ApiResponseDTO(String.valueOf(HttpStatus.CONFLICT.value()), ex.getMessage()));
     }
 }

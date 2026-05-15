@@ -33,4 +33,19 @@ public interface BarbershopConfigRepository extends JpaRepository<BarbershopConf
                 LIMIT 1
         """, nativeQuery = true)
     Optional<String> findConfigValueToBarber(@Param("id") long barberId, @Param("config") String config);
+
+    /**
+     * Returns a system-level (global) config value — rows where both BARBER_ID and LOCATION_ID are NULL.
+     * Used for configs that are not tied to any specific barber or location,
+     * such as SERVER_PRINCIPLE_IP.
+     */
+    @Query(value = """
+            SELECT C.CONFIG_VALUE
+                FROM TB_CONFIG C
+                WHERE C.CONFIG_NAME = :config
+                  AND C.BARBER_ID IS NULL
+                  AND C.LOCATION_ID IS NULL
+                LIMIT 1
+            """, nativeQuery = true)
+    Optional<String> findGlobalConfigValue(@Param("config") String config);
 }

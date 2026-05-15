@@ -16,8 +16,8 @@ public record CreateConfigRequestDTO (Integer configId,
                 .id(configId)
                 .value(configValue)
                 .name(configName.getConfigName())
-                .barberId(BarberEntity.builder().id(barberId).build())
-                .locationId(BarberLocationEntity.builder().id(locationId).build())
+                .barberId(barberId != null ? BarberEntity.builder().id(barberId).build() : null)
+                .locationId(locationId != null ? BarberLocationEntity.builder().id(locationId).build() : null)
                 .build();
     }
 }
